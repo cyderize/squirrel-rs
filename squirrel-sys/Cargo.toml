@@ -1,0 +1,21 @@
+[package]
+name = "squirrel-sys"
+version = "0.0.1"
+authors = ["cyderize <admin@cyderize.org>"]
+
+description = "Squirrel bindings for Rust."
+license = "MIT"
+
+documentation = "http://cyderize.github.io/squirrel-rs/doc/squirrel_sys/"
+homepage = "http://cyderize.github.io/squirrel-rs/"
+repository = "https://github.com/cyderize/squirrel-rs.git"
+
+links = "squirrel"
+build = "src/build.rs"
+
+[dependencies]
+libc = "*"
+
+[features]
+double-precision = []
+wide-chars = []

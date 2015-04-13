@@ -1,0 +1,26 @@
+[package]
+name = "squirrel"
+version = "0.0.1"
+authors = ["cyderize <admin@cyderize.org>"]
+
+description = "Squirrel bindings for Rust."
+license = "MIT"
+
+documentation = "http://cyderize.github.io/squirrel-rs/doc/squirrel/"
+homepage = "http://cyderize.github.io/squirrel-rs/"
+repository = "https://github.com/cyderize/squirrel-rs.git"
+
+build = "src/build.rs"
+
+[build-dependencies]
+gcc = "*"
+
+[dependencies.squirrel-sys]
+version = "0.0.1"
+path = "squirrel-sys"
+
+[dependencies]
+libc = "*"
+
+[features]
+double-precision = ["squirrel-sys/double-precision"]
