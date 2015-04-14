@@ -14,14 +14,14 @@ use std::str::from_utf8;
 use std::slice;
 
 /// Print shim callback type
-type PrintFn = extern fn(v: ffi::HSQUIRRELVM, len: usize, buf: *const c_char);
+pub type PrintFn = extern fn(v: ffi::HSQUIRRELVM, len: usize, buf: *const c_char);
 
 extern {
 	fn shim_set_print_callback(cb: PrintFn);
 	fn shim_set_err_callback(cb: PrintFn);
 	
-	fn shim_print_fn(v: ffi::HSQUIRRELVM, s: *const ffi::SQChar, ...);
-	fn shim_err_fn(v: ffi::HSQUIRRELVM, s: *const ffi::SQChar, ...);
+	pub fn shim_print_fn(v: ffi::HSQUIRRELVM, s: *const ffi::SQChar, ...);
+	pub fn shim_err_fn(v: ffi::HSQUIRRELVM, s: *const ffi::SQChar, ...);
 }
 
 /// Print callback
@@ -325,44 +325,208 @@ impl<P: Write + Sync, E: Write + Sync> SquirrelVM<P, E> {
 		unsafe { ffi::sq_pushnull(self.0); }
 	}
 	
-	/* Object manipulation */
+	//pub fn sq_gettype(v: HSQUIRRELVM, idx: SQInteger) -> SQObjectType;
+	//pub fn sq_typeof(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_getsize(v: HSQUIRRELVM, idx: SQInteger) -> SQInteger;
+	//pub fn sq_gethash(v: HSQUIRRELVM, idx: SQInteger) -> SQHash;
+	//pub fn sq_getbase(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_instanceof(v: HSQUIRRELVM) -> SQBool;
+	//pub fn sq_tostring(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_tobool(v: HSQUIRRELVM, idx: SQInteger, b: *mut SQBool) -> c_void;
+	//pub fn sq_getstring(v: HSQUIRRELVM, idx: SQInteger, c: *mut *const SQChar) -> SQRESULT;
+	//pub fn sq_getinteger(v: HSQUIRRELVM, idx: SQInteger, i: *mut SQInteger) -> SQRESULT;
+	//pub fn sq_getfloat(v: HSQUIRRELVM, idx: SQInteger, f: *mut SQFloat) -> SQRESULT;
+	//pub fn sq_getbool(v: HSQUIRRELVM, idx: SQInteger, b: *mut SQBool) -> SQRESULT;
+	//pub fn sq_getthread(v: HSQUIRRELVM, idx: SQInteger, thread: *mut HSQUIRRELVM) -> SQRESULT;
+	//pub fn sq_getuserpointer(v: HSQUIRRELVM, idx: SQInteger, p: *mut SQUserPointer) -> SQRESULT;
+	//pub fn sq_getuserdata(v: HSQUIRRELVM, idx: SQInteger, p: *mut SQUserPointer, typetag: *mut SQUserPointer) -> SQRESULT;
+	//pub fn sq_settypetag(v: HSQUIRRELVM, idx: SQInteger, typetag: SQUserPointer) -> SQRESULT;
+	//pub fn sq_gettypetag(v: HSQUIRRELVM, idx: SQInteger, typetag: *mut SQUserPointer) -> SQRESULT;
+	//pub fn sq_setreleasehook(v: HSQUIRRELVM,idx: SQInteger, hook: SQRELEASEHOOK) -> c_void;
+	//pub fn sq_getscratchpad(v: HSQUIRRELVM, minsize: SQInteger) -> *mut SQChar;
+	//pub fn sq_getfunctioninfo(v: HSQUIRRELVM, level: SQInteger,  fi: *mut SQFunctionInfo) -> SQRESULT;
+	//pub fn sq_getclosureinfo(v: HSQUIRRELVM, idx: SQInteger, nparams: *mut SQUnsignedInteger, nfreevars: *mut SQUnsignedInteger) -> SQRESULT;
+	//pub fn sq_getclosurename(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_setnativeclosurename(v: HSQUIRRELVM, idx: SQInteger, name: *const SQChar) -> SQRESULT;
+	//pub fn sq_setinstanceup(v: HSQUIRRELVM, idx: SQInteger, p: SQUserPointer) -> SQRESULT;
+	//pub fn sq_getinstanceup(v: HSQUIRRELVM, idx: SQInteger, p: *mut SQUserPointer, typetag: SQUserPointer) -> SQRESULT;
+	//pub fn sq_setclassudsize(v: HSQUIRRELVM, idx: SQInteger, udsize: SQInteger) -> SQRESULT;
+	//pub fn sq_newclass(v: HSQUIRRELVM, hasbase: SQBool) -> SQRESULT;
+	//pub fn sq_createinstance(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_setattributes(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_getattributes(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_getclass(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_weakref(v: HSQUIRRELVM, idx: SQInteger) -> c_void;
+	//pub fn sq_getdefaultdelegate(v: HSQUIRRELVM, t: SQObjectType) -> SQRESULT;
+	//pub fn sq_getmemberhandle(v: HSQUIRRELVM, idx: SQInteger, handle: *mut HSQMEMBERHANDLE) -> SQRESULT;
+	//pub fn sq_getbyhandle(v: HSQUIRRELVM,idx: SQInteger, handle: *const HSQMEMBERHANDLE) -> SQRESULT;
+	//pub fn sq_setbyhandle(v: HSQUIRRELVM,idx: SQInteger, handle: *const HSQMEMBERHANDLE) -> SQRESULT;
 	
-	pub fn get(&mut self, idx: isize) -> Result<(), ()> {
-		let result = unsafe { ffi::sq_get(self.0, idx) };
-		if ffi::SQ_SUCCEEDED(result) {
-			Ok(())
-		}
-		else {
-			Err(())
-		}
-	}
+	/* Object manipulation */
 	
 	pub fn push_root_table(&mut self) {
 		unsafe { ffi::sq_pushroottable(self.0); }
 	}
+
+	pub fn push_registry_table(&mut self) {
+		unsafe { ffi::sq_pushregistrytable(self.0); }
+	}
+	
+	pub fn push_const_table(&mut self) {
+		unsafe { ffi::sq_pushconsttable(self.0); }
+	}
+	
+	pub fn set_root_table(&mut self) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_setroottable(self.0)
+		}, (), ())
+	}
+	
+	pub fn set_const_table(&mut self) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_setconsttable(self.0)
+		}, (), ())
+	}
+	
+	pub fn new_slot(&mut self, idx: isize, bstatic: bool) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_newslot(self.0, idx, bstatic as ffi::SQBool)
+		}, (), ())
+	}
+	
+	pub fn delete_slot(&mut self, idx: isize, push_val: bool) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_deleteslot(self.0, idx, push_val as ffi::SQBool)
+		}, (), ())
+	}
+	
+	pub fn set(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_set(self.0, idx)
+		}, (), ())
+	}
+	
+	pub fn get(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_get(self.0, idx)
+		}, (), ())
+	}
+	
+	//pub fn sq_rawget(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_rawset(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_rawdeleteslot(v: HSQUIRRELVM, idx: SQInteger, pushval: SQBool) -> SQRESULT;
+	//pub fn sq_newmember(v: HSQUIRRELVM, idx: SQInteger, bstatic: SQBool) -> SQRESULT;
+	//pub fn sq_rawnewmember(v: HSQUIRRELVM, idx: SQInteger, bstatic: SQBool) -> SQRESULT;
+	//pub fn sq_arrayappend(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_arraypop(v: HSQUIRRELVM, idx: SQInteger, pushval: SQBool) -> SQRESULT; 
+	//pub fn sq_arrayresize(v: HSQUIRRELVM, idx: SQInteger, newsize: SQInteger) -> SQRESULT; 
+	//pub fn sq_arrayreverse(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT; 
+	//pub fn sq_arrayremove(v: HSQUIRRELVM, idx: SQInteger, itemidx: SQInteger) -> SQRESULT;
+	//pub fn sq_arrayinsert(v: HSQUIRRELVM, idx: SQInteger, destpos: SQInteger) -> SQRESULT;
+	//pub fn sq_setdelegate(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_getdelegate(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_clone(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_setfreevariable(v: HSQUIRRELVM, idx: SQInteger, nval: SQUnsignedInteger) -> SQRESULT;
+	//pub fn sq_next(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_getweakrefval(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	//pub fn sq_clear(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
 	
 	/* Calls */
 	
 	pub fn call(&mut self, param_count: isize, retval: bool, raise_error: bool) -> Result<(), ()> {
-		let result = unsafe {
+		get_result(unsafe {
 			ffi::sq_call(self.0, param_count, retval as ffi::SQBool, raise_error as ffi::SQBool)
-		};
-		
-		if ffi::SQ_SUCCEEDED(result) {
-			Ok(())
+		}, (), ())
+	}
+	
+	pub fn resume(&mut self, retval: bool, raise_error: bool) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_resume(self.0, retval as ffi::SQBool, raise_error as ffi::SQBool)
+		}, (), ())
+	}
+	
+	pub fn get_local(&mut self, level: usize, idx: usize) -> String {
+		unsafe {
+			from_utf8(CStr::from_ptr(ffi::sq_getlocal(self.0, level, idx)).to_bytes()).unwrap().to_string()
 		}
-		else {
-			Err(())
+	}
+	
+	pub fn get_callee(&mut self) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_getcallee(self.0)
+		}, (), ())
+	}
+	
+	pub fn get_free_variable(&mut self, idx: isize, nval: usize) -> String {
+		unsafe {
+			from_utf8(CStr::from_ptr(ffi::sq_getfreevariable(self.0, idx, nval)).to_bytes()).unwrap().to_string()
+		}
+	}
+	
+	pub fn throw_error(&mut self, error: &str) -> Result<(), ()> {
+		let error = CString::new(error).unwrap();
+		get_result(unsafe {
+			ffi::sq_throwerror(self.0, error.as_ptr())
+		}, (), ())
+	}
+	
+	pub fn throw_object(&mut self) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_throwobject(self.0)
+		}, (), ())
+	}
+	
+	pub fn reset_error(&mut self) {
+		unsafe {
+			ffi::sq_reseterror(self.0);
+		}
+	}
+	
+	pub fn get_last_error(&mut self) {
+		unsafe {
+			ffi::sq_getlasterror(self.0);
 		}
 	}
 	
 	/* Raw object handling */
 	
+	//pub fn sq_getstackobj(v: HSQUIRRELVM, idx: SQInteger, po: *mut HSQOBJECT) -> SQRESULT;
+	//pub fn sq_pushobject(v: HSQUIRRELVM, obj: HSQOBJECT) -> c_void;
+	//pub fn sq_addref(v: HSQUIRRELVM, po: *mut HSQOBJECT) -> c_void;
+	//pub fn sq_release(v: HSQUIRRELVM, po: *mut HSQOBJECT) -> SQBool;
+	//pub fn sq_getrefcount(v: HSQUIRRELVM, po: *mut HSQOBJECT) -> SQUnsignedInteger;
+	//pub fn sq_resetobject(po: *mut HSQOBJECT) -> c_void;
+	//pub fn sq_objtostring(o: *const HSQOBJECT) -> *const SQChar;
+	//pub fn sq_objtobool(o: *const HSQOBJECT) -> SQBool;
+	//pub fn sq_objtointeger(o: *const HSQOBJECT) -> SQInteger;
+	//pub fn sq_objtofloat(o: *const HSQOBJECT) -> SQFloat;
+	//pub fn sq_objtouserpointer(o: *const HSQOBJECT) -> SQUserPointer;
+	//pub fn sq_getobjtypetag(o: *const HSQOBJECT, typetag: *mut SQUserPointer) -> SQRESULT;
+	
 	/* GC */
+	
+	pub fn collect_garbage(&mut self) -> isize {
+		unsafe {
+			ffi::sq_collectgarbage(self.0)
+		}
+	}
+	
+	pub fn resurrect_unreachable(&mut self) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_resurrectunreachable(self.0)
+		}, (), ())
+	}
 	
 	/* Serialization */
 	
+	//pub fn write_closure(vm: HSQUIRRELVM, writef: SQWRITEFUNC, up: SQUserPointer) -> SQRESULT;
+	//pub fn sq_readclosure(vm: HSQUIRRELVM, readf: SQREADFUNC,up: SQUserPointer) -> SQRESULT;
+	
 	/* Memory allocation */
+	
+	//pub fn sq_malloc(size: SQUnsignedInteger) -> *mut c_void;
+	//pub fn sq_realloc(p: *mut c_void, oldsize: SQUnsignedInteger, newsize: SQUnsignedInteger) -> *mut c_void;
+	//pub fn sq_free(p: *mut c_void, size: SQUnsignedInteger) -> c_void;
 	
 	/* Debug */
 	
@@ -474,7 +638,6 @@ impl<P, E> Drop for SquirrelVM<P, E> {
 		unsafe { ffi::sq_close(self.0) }
 	}
 }
-
 
 /// Represents a compiler error thrown by a SquirrelVM.
 #[derive(Debug, Clone)]
