@@ -14,14 +14,14 @@ use std::str::from_utf8;
 use std::slice;
 
 /// Print shim callback type
-pub type PrintFn = extern fn(v: ffi::HSQUIRRELVM, len: usize, buf: *const c_char);
+type PrintFn = extern fn(v: ffi::HSQUIRRELVM, len: usize, buf: *const c_char);
 
 extern {
 	fn shim_set_print_callback(cb: PrintFn);
 	fn shim_set_err_callback(cb: PrintFn);
 	
-	pub fn shim_print_fn(v: ffi::HSQUIRRELVM, s: *const ffi::SQChar, ...);
-	pub fn shim_err_fn(v: ffi::HSQUIRRELVM, s: *const ffi::SQChar, ...);
+	fn shim_print_fn(v: ffi::HSQUIRRELVM, s: *const ffi::SQChar, ...);
+	fn shim_err_fn(v: ffi::HSQUIRRELVM, s: *const ffi::SQChar, ...);
 }
 
 /// Print callback
