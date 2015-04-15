@@ -412,24 +412,115 @@ impl<P: Write + Sync, E: Write + Sync> SquirrelVM<P, E> {
 		}, (), ())
 	}
 	
-	//pub fn sq_rawget(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
-	//pub fn sq_rawset(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
-	//pub fn sq_rawdeleteslot(v: HSQUIRRELVM, idx: SQInteger, pushval: SQBool) -> SQRESULT;
-	//pub fn sq_newmember(v: HSQUIRRELVM, idx: SQInteger, bstatic: SQBool) -> SQRESULT;
-	//pub fn sq_rawnewmember(v: HSQUIRRELVM, idx: SQInteger, bstatic: SQBool) -> SQRESULT;
-	//pub fn sq_arrayappend(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
-	//pub fn sq_arraypop(v: HSQUIRRELVM, idx: SQInteger, pushval: SQBool) -> SQRESULT; 
-	//pub fn sq_arrayresize(v: HSQUIRRELVM, idx: SQInteger, newsize: SQInteger) -> SQRESULT; 
-	//pub fn sq_arrayreverse(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT; 
-	//pub fn sq_arrayremove(v: HSQUIRRELVM, idx: SQInteger, itemidx: SQInteger) -> SQRESULT;
-	//pub fn sq_arrayinsert(v: HSQUIRRELVM, idx: SQInteger, destpos: SQInteger) -> SQRESULT;
-	//pub fn sq_setdelegate(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
-	//pub fn sq_getdelegate(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
-	//pub fn sq_clone(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
-	//pub fn sq_setfreevariable(v: HSQUIRRELVM, idx: SQInteger, nval: SQUnsignedInteger) -> SQRESULT;
-	//pub fn sq_next(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
-	//pub fn sq_getweakrefval(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
-	//pub fn sq_clear(v: HSQUIRRELVM, idx: SQInteger) -> SQRESULT;
+	pub fn raw_set(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_rawset(self.0, idx)
+		}, (), ())
+	}
+	
+	pub fn raw_get(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_rawget(self.0, idx)
+		}, (), ())
+	}
+	
+	pub fn raw_delete_slot(&mut self, idx: isize, push_val: bool) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_rawdeleteslot(self.0, idx, push_val as ffi::SQBool)
+		}, (), ())
+	}
+	
+	pub fn new_member(&mut self, idx: isize, bstatic: bool) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_newmember(self.0, idx, bstatic as ffi::SQBool)
+		}, (), ())
+	}
+	
+	pub fn raw_new_member(&mut self, idx: isize, bstatic: bool) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_rawnewmember(self.0, idx, bstatic as ffi::SQBool)
+		}, (), ())
+	}
+	
+	pub fn array_append(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_arrayappend(self.0, idx)
+		}, (), ())
+	}
+	
+	pub fn array_pop(&mut self, idx: isize, push_val: bool) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_arraypop(self.0, idx, push_val as ffi::SQBool)
+		}, (), ())
+	}
+	
+	pub fn sq_arrayresize(&mut self, idx: isize, new_size: usize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_arraypop(self.0, idx, new_size)
+		}, (), ())
+	}
+	
+	pub fn array_reverse(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_arrayreverse(self.0, idx)
+		}, (), ())
+	}
+	
+	pub fn array_remove(&mut self, idx: isize, item_idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_arrayremove(self.0, idx, item_idx)
+		}, (), ())
+	}
+	
+	pub fn array_insert(&mut self, idx: isize, dest_pos: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_arrayinsert(self.0, idx, dest_pos)
+		}, (), ())
+	}
+	
+	pub fn set_delegate(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_setdelegate(self.0, idx)
+		}, (), ())
+	}
+	
+	pub fn get_delegate(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_getdelegate(self.0, idx)
+		}, (), ())
+	}
+	
+	// This seems like a conflicting name
+	pub fn clone(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_clone(self.0, idx)
+		}, (), ())
+	}
+	
+	pub fn set_free_variable(&mut self, idx: isize, n_val: usize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_setfreevariable(self.0, idx, n_val)
+		}, (), ())
+	}
+	
+	// This seems like a conflicting name
+	pub fn next(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_next(self.0, idx)
+		}, (), ())
+	}
+	
+	pub fn get_weak_ref_val(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_getweakrefval(self.0, idx)
+		}, (), ())
+	}
+	
+	pub fn clear(&mut self, idx: isize) -> Result<(), ()> {
+		get_result(unsafe {
+			ffi::sq_clear(self.0, idx)
+		}, (), ())
+	}
 	
 	/* Calls */
 	
